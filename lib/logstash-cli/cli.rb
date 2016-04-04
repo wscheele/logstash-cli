@@ -22,8 +22,14 @@ module LogstashCli
         original_options = super
         return original_options unless File.exists?("/etc/logstash-cli.yaml")
         defaults = ::YAML::load_file("/etc/logstash-cli.yaml") || {}
-        new_options = Thor::CoreExt::HashWithIndifferentAccess.new(original_options.merge(defaults))
-        return Hash[new_options.map { |k, v| [k.to_sym, v] }]
+        mo = LogstashCli::CLI.commands[$*[0]].options
+        result = Hash[original_options.clone]
+        mo.each do |key, value|
+          if (!result[key.to_s] or result[key.to_s] == mo[key].default) and defaults[key.to_s]
+            result[key.to_s] = defaults[key.to_s]
+          end
+        end
+        return Hash[result.map { |k, v| [k.to_sym, v] }]
       end
     }
 
