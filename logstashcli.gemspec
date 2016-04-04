@@ -21,7 +21,7 @@ Gem::Specification.new do |s|
   s.add_dependency "yajl-ruby"
   s.add_dependency "fastercsv"
   s.add_dependency "json"
-  s.metadata['allowed_push_host'] = 'https://artifactory.ci.ops.sf.local/api/gems/rubygems/'
+  s.metadata['allowed_push_host'] = 'https://artifactory.ci.ops.sf.local/api/gems/rubygems-local/'
   #s.add_dependency "amqp-utils"
 
   s.add_development_dependency "bundler", ">= 1.0.0"

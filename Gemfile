@@ -1,4 +1,4 @@
-source "https://artifactory.ci.ops.sf.local/api/gems/rubygems/"
+source "https://artifactory.ci.ops.sf.local/api/gems/rubygems-local/"
 
 gem "logstash-cli", :path => "."
 
