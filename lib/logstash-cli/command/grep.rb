@@ -18,33 +18,33 @@ module Grep
     value, units = $1, $2
     value = value.to_i
     start = case units.to_s.downcase
-            when 'm', 'min', 'mins', 'minute', 'minutes'
-              Time.now - value*60
-            when 'h', 'hr', 'hrs', 'hour', 'hours'
-              Time.now - value*3600
-            when 'd', 'day', 'days'
-              Time.now - value*86400
-            when 'w', 'wk', 'wks', 'week', 'weeks'
-              Time.now - 7.0*value*86400
-            when 'y', 'yr', 'yrs', 'year', 'years'
-              Time.now - 365.0*value*86400
-            else
-              raise ArgumentError
+              when 'm', 'min', 'mins', 'minute', 'minutes'
+                Time.now - value*60
+              when 'h', 'hr', 'hrs', 'hour', 'hours'
+                Time.now - value*3600
+              when 'd', 'day', 'days'
+                Time.now - value*86400
+              when 'w', 'wk', 'wks', 'week', 'weeks'
+                Time.now - 7.0*value*86400
+              when 'y', 'yr', 'yrs', 'year', 'years'
+                Time.now - 365.0*value*86400
+              else
+                raise ArgumentError
             end
     [start, Time.now]
   end
 
-  def _grep(pattern,options)
+  def _grep(pattern, options)
     es_url = options[:esurl]
-    index_prefix =  options[:index_prefix]
+    index_prefix = options[:index_prefix]
     metafields = options[:meta].split(',')
     fields = options[:fields].split(',')
 
     begin
       from_time, to_time = if options[:from] && options[:to]
-                             [ Time.parse(options[:from]),
-                               Time.parse(options[:to]) ]
-                           elsif options[:from] && ! options[:to]
+                             [Time.parse(options[:from]),
+                              Time.parse(options[:to])]
+                           elsif options[:from] && !options[:to]
                              [Time.parse(options[:from]), Time.now]
                            elsif options[:last]
                              Grep.parse_time_range(options[:last])
@@ -75,7 +75,7 @@ module Grep
     # We reverse the order of working ourselves through the index
     index_range.reverse.each do |idx|
       begin
-        Tire.configure {url es_url}
+        Tire.configure { url es_url }
         search = Tire.search(idx) do
           query do
             string "#{pattern}"
@@ -83,7 +83,7 @@ module Grep
           sort do
             by :@timestamp, 'desc'
           end
-          filter "range", "@timestamp" => { "from" => from, "to" => to}
+          filter "range", "@timestamp" => {"from" => from, "to" => to}
           size running_result_size
         end
       rescue Exception => e
@@ -98,7 +98,7 @@ module Grep
         # Decrease the number of results to get from the next index
         running_result_size -= search.results.size
 
-        search.results.sort {|a,b| a[:@timestamp] <=> b[:@timestamp] }.each do |res|
+        search.results.sort { |a, b| a[:@timestamp] <=> b[:@timestamp] }.each do |res|
 
           had_fields = false
           metafields.each do |metafield|
@@ -108,7 +108,7 @@ module Grep
               end
               had_fields = true
             else
-              result << res["@#{metafield}".to_sym]
+              result << res["#{metafield}".to_sym]
             end
           end
 
