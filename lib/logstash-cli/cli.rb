@@ -50,6 +50,8 @@ module LogstashCli
     method_option :meta, :default => "timestamp,type,message", :desc => "Meta Logstash fields to show"
     method_option :delim, :default => "|", :desc => "plain or csv delimiter"
 
+    method_option :filter, :default => nil, :desc => "Specify grep patterns for fields. Syntax: fieldname:pattern"
+
     def tail()
       _tail(options)
     end

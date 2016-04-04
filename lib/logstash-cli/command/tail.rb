@@ -1,4 +1,5 @@
 require 'yajl/json_gem'
+require 'time'
 
 module Tail
 
@@ -19,12 +20,21 @@ module Tail
     auto_delete = options[:autodelete]
     routing_key = options[:key]
     metafields = options[:meta].split(',')
+    filter = options[:filter] ? options[:filter].split(',').map { |string| {string.split(':')[0] => string.split(':')[1]} }.reduce({}, :merge) : nil
+
+    def do_grep(filter, parsed_message)
+      return true unless filter
+      filter.each do |field, pattern|
+        return false unless (parsed_message[field] =~ /#{pattern}/)
+      end
+
+    end
 
     begin
       #connection = AMQP.connect(AMQP_OPTS.merge(:username => "amqp_gem", :password => "amqp_gem_password", :vhost => "amqp_gem_testbed"))
-      settings= { :host =>  amqp_host, :vhost => amqp_vhost, :port => amqp_port,
-                  :user => amqp_user, :password => amqp_password ,
-                  :ssl => amqp_ssl }
+      settings= {:host => amqp_host, :vhost => amqp_vhost, :port => amqp_port,
+                 :user => amqp_user, :password => amqp_password,
+                 :ssl => amqp_ssl}
 
       # Amqp url can override settings
       unless amqp_url.nil?
@@ -36,17 +46,21 @@ module Tail
 
         channel = AMQP::Channel.new(connection, :auto_recovery => true)
 
-        channel.queue("", :auto_delete => auto_delete, :persistent => persistent , :durable => durable)   do |queue, declare_ok|
+        channel.queue("", :auto_delete => auto_delete, :persistent => persistent, :durable => durable) do |queue, declare_ok|
           queue.bind(exchange_name, :routing_key => routing_key)
           queue.subscribe do |payload|
             parsed_message = JSON.parse(payload)
             result = Array.new
 
-            metafields.each do |metafield|
-              result << parsed_message["@#{metafield}"]
+            parsed_message['@timestamp'] = Time.parse(parsed_message['@timestamp']).localtime
+
+            if do_grep filter, parsed_message
+              metafields.each do |metafield|
+                result << parsed_message["#{metafield}"]
+              end
+              puts _format(result, options)
             end
 
-            puts _format(result, options)
             result = []
           end
         end
