@@ -100,6 +100,8 @@ module Grep
 
         search.results.sort { |a, b| a[:@timestamp] <=> b[:@timestamp] }.each do |res|
 
+          res['@timestamp'] = Time.parse(res['@timestamp']).localtime
+
           had_fields = false
           metafields.each do |metafield|
             if metafield == 'fields' then
