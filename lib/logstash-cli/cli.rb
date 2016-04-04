@@ -17,13 +17,15 @@ module LogstashCli
 
     include LogstashCli::Command
 
-    def options
-      original_options = super
-      return original_options unless File.exists?("/etc/logstash-cli.yaml")
-      defaults = ::YAML::load_file("/etc/logstash-cli.yaml") || {}
-      Thor::CoreExt::HashWithIndifferentAccess.new(defaults.merge(original_options))
-    end
-
+    no_commands {
+      def options
+        original_options = super
+        return original_options unless File.exists?("/etc/logstash-cli.yaml")
+        defaults = ::YAML::load_file("/etc/logstash-cli.yaml") || {}
+        new_options = Thor::CoreExt::HashWithIndifferentAccess.new(original_options.merge(defaults))
+        return Hash[new_options.map { |k, v| [k.to_sym, v] }]
+      end
+    }
 
     desc "grep PATTERN", "Search logstash for a pattern"
     method_option :esurl, :default => 'http://localhost:9200', :desc => "URL to connect to elasticsearch"
