@@ -14,13 +14,13 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = ">= 1.3.6"
   s.rubyforge_project = "logstash-cli"
 
-  s.add_dependency "tire"
-  s.add_dependency "thor"
-  s.add_dependency "amqp"
-  s.add_dependency "rack"
+  s.add_dependency "tire", "0.6.2"
+  s.add_dependency "thor", "0.19.1"
+  s.add_dependency "amqp", "1.6.0"
+  s.add_dependency "rack", "1.6.4"
   s.add_dependency "yajl-ruby"
-  s.add_dependency "fastercsv"
-  s.add_dependency "json"
+  s.add_dependency "fastercsv", "1.5.5"
+  s.add_dependency "json", "1.8.3"
   s.metadata['allowed_push_host'] = 'https://artifactory.ci.ops.sf.local/api/gems/rubygems-local/'
   #s.add_dependency "amqp-utils"
 
