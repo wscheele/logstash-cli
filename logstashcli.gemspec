@@ -14,6 +14,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = ">= 1.3.6"
   s.rubyforge_project = "logstash-cli"
 
+  s.add_dependency "activesupport", "4.2.6" # attempt to pin activesupport to ruby 2.0 compat
   s.add_dependency "tire", "0.6.2"
   s.add_dependency "thor", "0.19.1"
   s.add_dependency "amqp", "1.6.0"
